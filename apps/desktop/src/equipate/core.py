@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
 
 
@@ -11,14 +12,14 @@ def core_dir() -> Path:
     env = os.environ.get("EQUIPATE_CORE")
     if env and Path(env).is_dir():
         return Path(env)
+    bundle = getattr(sys, "_MEIPASS", None)
+    if bundle and (Path(bundle) / "core" / "schema.json").is_file():
+        return Path(bundle) / "core"
     here = Path(__file__).resolve()
     for parent in here.parents:
         candidate = parent / "core"
         if (candidate / "schema.json").is_file():
             return candidate
-        bundled = parent / "core"
-        if (bundled / "rules.json").is_file():
-            return bundled
     raise FileNotFoundError("No se encontro la carpeta core/.")
 
 

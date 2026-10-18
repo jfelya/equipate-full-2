@@ -37,6 +37,10 @@ def apply_theme(root: tk.Tk, tokens: dict, name: str) -> dict:
     style.configure("TNotebook.Tab", background=c["surfaceAlt"], foreground=c["text"], padding=(14, 6))
     style.map("TNotebook.Tab", background=[("selected", c["surface"])], foreground=[("selected", c["accent"])])
 
+    family = tokens["typography"]["fontFamily"].split(",")[0].strip()
+    style.configure("LangOn.TLabel", background=c["surface"], foreground=c["accent"], font=(family, 11, "bold"))
+    style.configure("LangOff.TLabel", background=c["surface"], foreground=c["muted"], font=(family, 11))
+
     style.configure(
         "Treeview",
         background=c["surface"],

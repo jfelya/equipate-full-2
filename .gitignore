@@ -5,6 +5,15 @@ __pycache__/
 *.sqlite
 .equipate_full/
 
+# PyInstaller
+apps/desktop/build/
+apps/desktop/dist/
+*.spec.bak
+
+# Firma
+*.cer
+*.pfx
+
 # Node / web
 node_modules/
 

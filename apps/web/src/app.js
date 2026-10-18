@@ -1,7 +1,7 @@
-// App web standalone: sin build, sin dependencias.
+// App web standalone: sin build, sin dependencias, mobile-first.
 import { loadCore } from "./core.js";
 import { I18n } from "./i18n.js";
-import { Store, sha256 } from "./store.js";
+import { Store } from "./store.js";
 import { applyTheme, otherTheme } from "./theme.js";
 import { validateEntity, validateCart, formatError } from "./validate.js";
 
@@ -11,6 +11,17 @@ const t = (key, params) => S.i18n.t(key, params);
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const money = (v) => `${Number(v).toLocaleString()} ${t("currency.symbol")}`;
 const $ = (sel) => document.querySelector(sel);
+
+const SUN = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>`;
+const MOON = `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>`;
+
+/** Tabla segura para movil: envuelta para permitir scroll horizontal. */
+function table(headers, rows) {
+  return `<div class="table-wrap"><table>
+    <thead><tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr></thead>
+    <tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>
+  </table></div>`;
+}
 
 function errText(err, field) {
   const label = t(`fields.${field || err.field}`);
@@ -34,17 +45,22 @@ function renderNav() {
     ["invoices", "nav.invoices", logged],
     ["admin", "nav.admin", isAdmin],
   ];
+  const es = S.i18n.lang === "es";
+  const target = otherTheme(S.theme);
   $("#nav").innerHTML = `
-    <div class="brand">${esc(t("app.name"))} <span class="tagline">${esc(t("app.tagline"))}</span></div>
-    <nav class="links">
-      ${links.filter(([, , on]) => on).map(([v, k]) => `<button data-view="${v}" class="${S.view === v ? "active" : ""}">${esc(t(k))}</button>`).join("")}
-    </nav>
+    <div class="brand">${esc(t("app.name"))}<span class="tagline">${esc(t("app.tagline"))}</span></div>
     <div class="session">
-      <button id="lang" class="mini-btn">${S.i18n.lang.toUpperCase()}</button>
-      <button id="theme" class="mini-btn">${esc(t(`theme.${otherTheme(S.theme)}`))}</button>
-      ${logged
-        ? `<span class="who">${esc(t("messages.session_user", { usuario: S.user.usuario }))}</span><button id="logout">${esc(t("nav.logout"))}</button>`
-        : ""}
+      <button id="lang" class="mini-btn" title="${esc(t("theme.language"))}" aria-label="${esc(t("theme.language"))}">
+        <span class="${es ? "on" : ""}">ES</span><span class="slash">/</span><span class="${es ? "" : "on"}">EN</span>
+      </button>
+      <button id="theme" class="mini-btn" title="${esc(t(`theme.${target}`))}" aria-label="${esc(t(`theme.${target}`))}">
+        ${S.theme === "dark" ? SUN : MOON}
+      </button>
+      ${logged ? `<button id="logout" class="mini-btn">${esc(t("nav.logout"))}</button>` : ""}
+    </div>
+    <div class="links">
+      ${links.filter(([, , on]) => on).map(([v, k]) => `<button data-view="${v}" class="${S.view === v ? "active" : ""}">${esc(t(k))}</button>`).join("")}
+      ${logged ? `<span class="who">${esc(t("messages.session_user", { usuario: S.user.usuario }))}</span>` : ""}
     </div>`;
   $("#nav").querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => go(b.dataset.view)));
   $("#lang").addEventListener("click", toggleLang);
@@ -114,21 +130,14 @@ function doLogout() {
 // ------------------------------------------------------------------ catalogo
 async function viewCatalog() {
   const products = await S.store.productos();
+  const rows = products.map((p) => [
+    esc(p.nombre), p.stock, money(p.precio),
+    `<button class="primary" data-add="${p.id}">${esc(t("actions.agregar"))}</button>`,
+  ]);
   $("#view").innerHTML = `
     <section class="card">
       <h1>${esc(t("table.productos"))}</h1>
-      <table>
-        <thead><tr>
-          <th>${esc(t("fields.producto"))}</th><th>${esc(t("fields.stock"))}</th>
-          <th>${esc(t("fields.precio"))}</th><th>${esc(t("fields.acciones"))}</th>
-        </tr></thead>
-        <tbody>
-          ${products.map((p) => `<tr>
-            <td>${esc(p.nombre)}</td><td>${p.stock}</td><td>${money(p.precio)}</td>
-            <td><button class="primary" data-add="${p.id}">${esc(t("actions.agregar"))}</button></td>
-          </tr>`).join("")}
-        </tbody>
-      </table>
+      ${table([esc(t("fields.producto")), esc(t("fields.stock")), esc(t("fields.precio")), esc(t("fields.acciones"))], rows)}
     </section>`;
   $("#view").querySelectorAll("[data-add]").forEach((b) => b.addEventListener("click", () => addToCart(Number(b.dataset.add), products)));
 }
@@ -150,31 +159,22 @@ function addToCart(pid, products) {
 // -------------------------------------------------------------------- carrito
 function viewCart() {
   const total = S.cart.reduce((s, i) => s + i.precio * i.cantidad, 0);
+  const rows = S.cart.map((i, idx) => [
+    esc(i.nombre), money(i.precio), i.cantidad,
+    `<button data-qty="${idx}" data-d="-1" aria-label="${esc(t("actions.quitar"))}">−</button>
+     <button data-qty="${idx}" data-d="1">+</button>
+     <button class="danger" data-del="${idx}">${esc(t("actions.quitar"))}</button>`,
+  ]);
   $("#view").innerHTML = `
     <section class="card">
       <h1>${esc(t("table.carrito", { usuario: S.user.usuario }))}</h1>
       ${S.cart.length === 0 ? `<p class="muted">${esc(t("messages.empty_cart"))}</p>` : `
-      <table>
-        <thead><tr>
-          <th>${esc(t("fields.producto"))}</th><th>${esc(t("fields.precio"))}</th>
-          <th>${esc(t("fields.cantidad"))}</th><th>${esc(t("fields.acciones"))}</th>
-        </tr></thead>
-        <tbody>
-          ${S.cart.map((i, idx) => `<tr>
-            <td>${esc(i.nombre)}</td><td>${money(i.precio)}</td><td>${i.cantidad}</td>
-            <td>
-              <button data-qty="${idx}" data-d="-1">−</button>
-              <button data-qty="${idx}" data-d="1">+</button>
-              <button class="danger" data-del="${idx}">${esc(t("actions.quitar"))}</button>
-            </td>
-          </tr>`).join("")}
-        </tbody>
-      </table>
-      <p class="total">${esc(t("fields.total"))}: ${money(total)}</p>
-      <div class="row">
-        <button class="primary" id="buy">${esc(t("actions.comprar"))}</button>
-        <button id="clear">${esc(t("actions.vaciar"))}</button>
-      </div>`}
+        ${table([esc(t("fields.producto")), esc(t("fields.precio")), esc(t("fields.cantidad")), esc(t("fields.acciones"))], rows)}
+        <p class="total">${esc(t("fields.total"))}: ${money(total)}</p>
+        <div class="row">
+          <button class="primary" id="buy">${esc(t("actions.comprar"))}</button>
+          <button id="clear">${esc(t("actions.vaciar"))}</button>
+        </div>`}
     </section>`;
   $("#view").querySelectorAll("[data-qty]").forEach((b) => b.addEventListener("click", () => changeQty(Number(b.dataset.qty), Number(b.dataset.d))));
   $("#view").querySelectorAll("[data-del]").forEach((b) => b.addEventListener("click", () => { S.cart.splice(Number(b.dataset.del), 1); render(); }));
@@ -212,38 +212,35 @@ async function doCheckout() {
 // ------------------------------------------------------------------- facturas
 async function viewInvoices() {
   const invoices = await S.store.facturasByCliente(S.user.id);
+  const rows = invoices.map((inv) => [
+    inv.id, esc(inv.fecha.slice(0, 10)), money(inv.preciototal),
+    `<button data-det="${inv.id}">${esc(t("actions.ver_detalle"))}</button>`,
+  ]);
   $("#view").innerHTML = `
     <section class="card">
       <h1>${esc(t("table.facturas", { usuario: S.user.usuario }))}</h1>
       ${invoices.length === 0 ? `<p class="muted">${esc(t("messages.empty_invoices"))}</p>` : `
-      <table>
-        <thead><tr><th>#</th><th>${esc(t("fields.fecha"))}</th><th>${esc(t("fields.total"))}</th><th>${esc(t("fields.acciones"))}</th></tr></thead>
-        <tbody>
-          ${invoices.map((inv) => `<tr>
-            <td>${inv.id}</td><td>${esc(inv.fecha.slice(0, 10))}</td><td>${money(inv.preciototal)}</td>
-            <td><button data-det="${inv.id}">${esc(t("actions.ver_detalle"))}</button></td>
-          </tr>`).join("")}
-        </tbody>
-      </table>`}
+        ${table(["#", esc(t("fields.fecha")), esc(t("fields.total")), esc(t("fields.acciones"))], rows)}`}
       <div id="detail"></div>
     </section>`;
   $("#view").querySelectorAll("[data-det]").forEach((b) => b.addEventListener("click", () => showDetail(Number(b.dataset.det))));
 }
 
 async function showDetail(idFactura) {
-  const rows = await S.store.detalleByFactura(idFactura);
+  const rows = (await S.store.detalleByFactura(idFactura)).map((d) => [esc(d.nombre_producto), d.cantidad, money(d.precio)]);
   $("#detail").innerHTML = `
     <h2>${esc(t("table.detalle_factura", { id: idFactura }))}</h2>
-    <table>
-      <thead><tr><th>${esc(t("fields.producto"))}</th><th>${esc(t("fields.cantidad"))}</th><th>${esc(t("fields.precio"))}</th></tr></thead>
-      <tbody>${rows.map((d) => `<tr><td>${esc(d.nombre_producto)}</td><td>${d.cantidad}</td><td>${money(d.precio)}</td></tr>`).join("")}</tbody>
-    </table>`;
+    ${table([esc(t("fields.producto")), esc(t("fields.cantidad")), esc(t("fields.precio"))], rows)}`;
 }
 
 // ---------------------------------------------------------------------- admin
 async function viewAdmin() {
   const products = await S.store.productos();
   const preguntas = S.core.rules.validation.usuario.pregunta_secreta.values;
+  const rows = products.map((p) => [
+    esc(p.nombre), p.stock, money(p.precio),
+    `<button class="danger" data-delp="${p.id}">${esc(t("actions.borrar"))}</button>`,
+  ]);
   $("#view").innerHTML = `
     <section class="card">
       <h1>${esc(t("nav.admin"))}</h1>
@@ -270,13 +267,7 @@ async function viewAdmin() {
         </form>
       </div>
       <h2>${esc(t("admin.products"))}</h2>
-      <table>
-        <thead><tr><th>${esc(t("fields.producto"))}</th><th>${esc(t("fields.stock"))}</th><th>${esc(t("fields.precio"))}</th><th></th></tr></thead>
-        <tbody>${products.map((p) => `<tr>
-          <td>${esc(p.nombre)}</td><td>${p.stock}</td><td>${money(p.precio)}</td>
-          <td><button class="danger" data-delp="${p.id}">${esc(t("actions.borrar"))}</button></td>
-        </tr>`).join("")}</tbody>
-      </table>
+      ${table([esc(t("fields.producto")), esc(t("fields.stock")), esc(t("fields.precio")), ""], rows)}
     </section>`;
   $("#product-form").addEventListener("submit", registerProduct);
   $("#user-form").addEventListener("submit", registerUser);

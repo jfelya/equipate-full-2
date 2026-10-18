@@ -31,11 +31,29 @@ def db_path() -> str:
     return str(Path(__file__).resolve().parents[1] / "equipate.db")
 
 
+def icon_path() -> str | None:
+    candidates = []
+    bundle = getattr(sys, "_MEIPASS", None)
+    if bundle:
+        candidates.append(Path(bundle) / "assets" / "icon.ico")
+    candidates.append(Path(__file__).resolve().parents[1] / "assets" / "icon.ico")
+    for candidate in candidates:
+        if candidate.is_file():
+            return str(candidate)
+    return None
+
+
 def main() -> None:
     enable_dpi_awareness()
     core = load_all()
     store = Store(db_path(), core["schema"], core["seed"])
     root = tk.Tk()
+    icon = icon_path()
+    if icon:
+        try:
+            root.iconbitmap(default=icon)
+        except tk.TclError:
+            pass
     App(root, core, store)
     root.mainloop()
     store.close()

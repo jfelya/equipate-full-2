@@ -1,12 +1,72 @@
 """Interfaz Tkinter/ttk de Equipate Full (escritorio)."""
 from __future__ import annotations
 
+import math
 import tkinter as tk
 from tkinter import messagebox, ttk
 
 from .i18n import I18n
 from .theme import apply_theme
 from .validate import format_error, validate_cart, validate_entity
+
+
+class LangToggle(ttk.Frame):
+    """Un solo control para los dos idiomas: ES | EN (el activo resaltado)."""
+
+    def __init__(self, parent, lang, command):
+        super().__init__(parent)
+        self.command = command
+        self.labels = {}
+        for index, code in enumerate(("es", "en")):
+            if index:
+                ttk.Label(self, text="/", style="LangOff.TLabel").pack(side="left")
+            label = ttk.Label(self, text=code.upper(), padding=(4, 2), cursor="hand2")
+            label.pack(side="left")
+            label.bind("<Button-1>", lambda _e: self.command())
+            self.labels[code] = label
+        self.refresh(lang)
+
+    def refresh(self, lang: str) -> None:
+        for code, label in self.labels.items():
+            label.configure(style="LangOn.TLabel" if code == lang else "LangOff.TLabel")
+
+
+class ThemeIconButton(tk.Canvas):
+    """Un solo boton de tema con icono vectorial (sol/luna)."""
+
+    SIZE = 30
+
+    def __init__(self, parent, theme_name, command, colors):
+        super().__init__(parent, width=self.SIZE, height=self.SIZE, highlightthickness=0, bd=0)
+        self.command = command
+        self.theme_name = theme_name
+        self.colors = colors
+        self.configure(bg=colors["surface"], cursor="hand2")
+        self.bind("<Button-1>", lambda _e: self.command())
+        self._draw()
+
+    def set_theme(self, theme_name: str, colors: dict) -> None:
+        self.theme_name = theme_name
+        self.colors = colors
+        self.configure(bg=colors["surface"])
+        self._draw()
+
+    def _draw(self) -> None:
+        self.delete("all")
+        color = self.colors["accent"]
+        center = self.SIZE / 2
+        if self.theme_name == "dark":
+            # Muestra un sol: al pulsar se pasa a claro.
+            self.create_oval(center - 5, center - 5, center + 5, center + 5, outline=color, width=2)
+            for i in range(8):
+                angle = i * math.pi / 4
+                x1, y1 = center + math.cos(angle) * 8, center + math.sin(angle) * 8
+                x2, y2 = center + math.cos(angle) * 11, center + math.sin(angle) * 11
+                self.create_line(x1, y1, x2, y2, fill=color, width=2)
+        else:
+            # Muestra una luna: al pulsar se pasa a oscuro.
+            self.create_oval(center - 8, center - 8, center + 8, center + 8, outline=color, width=2)
+            self.create_oval(center - 2, center - 10, center + 14, center + 6, fill=self.colors["surface"], outline="")
 
 
 class App:
@@ -57,14 +117,10 @@ class App:
         self.lbl_user.pack(side="right", padx=8)
         self.btn_logout = ttk.Button(bar, text=self.t("nav.logout"), command=self.logout)
         self.btn_logout.pack(side="right")
-        self.btn_theme = ttk.Button(bar, text=self._theme_label(), command=self.toggle_theme)
-        self.btn_theme.pack(side="right", padx=6)
-        self.btn_lang = ttk.Button(bar, text=self.i18n.lang.upper(), command=self.toggle_lang)
+        self.btn_lang = LangToggle(bar, self.i18n.lang, self.toggle_lang)
         self.btn_lang.pack(side="right", padx=6)
-
-    def _theme_label(self) -> str:
-        other = "light" if self.theme_name == "dark" else "dark"
-        return self.t(f"theme.{other}")
+        self.btn_theme = ThemeIconButton(bar, self.theme_name, self.toggle_theme, self.colors)
+        self.btn_theme.pack(side="right", padx=6)
 
     # -------------------------------------------------------------- notebook
     def _build_notebook(self) -> None:
@@ -403,18 +459,18 @@ class App:
     def toggle_theme(self) -> None:
         self.theme_name = "light" if self.theme_name == "dark" else "dark"
         self.colors = apply_theme(self.root, self.core["tokens"], self.theme_name)
-        self.btn_theme.configure(text=self._theme_label())
+        self.btn_theme.set_theme(self.theme_name, self.colors)
 
     def toggle_lang(self) -> None:
         self.i18n.toggle()
-        self.btn_lang.configure(text=self.i18n.lang.upper())
+        self.btn_lang.refresh(self.i18n.lang)
         self.retranslate()
 
     def retranslate(self) -> None:
         self.root.title(self.t("app.name"))
         self.lbl_title.configure(text=self.t("app.name"))
         self.btn_logout.configure(text=self.t("nav.logout"))
-        self.btn_theme.configure(text=self._theme_label())
+        self.btn_lang.refresh(self.i18n.lang)
         self.lbl_login_user.configure(text=self.t("fields.usuario"))
         self.lbl_login_pass.configure(text=self.t("fields.contrasena"))
         self.btn_login.configure(text=self.t("actions.ingresar"))
@@ -423,8 +479,9 @@ class App:
         self.btn_buy.configure(text=self.t("actions.comprar"))
         for col, key in zip(("nombre", "stock", "precio"), ["fields.producto", "fields.stock", "fields.precio"]):
             self.tree_catalog.heading(col, text=self.t(key))
-            self.tree_cart.heading(col, text=self.t(key))
             self.tree_admin_products.heading(col, text=self.t(key))
+        for col, key in zip(("nombre", "precio", "cantidad"), ["fields.producto", "fields.precio", "fields.cantidad"]):
+            self.tree_cart.heading(col, text=self.t(key))
         for col, key in zip(("id", "fecha", "total"), ["fields.usuario", "fields.fecha", "fields.total"]):
             self.tree_invoices.heading(col, text=self.t(key))
         self.tree_invoices.heading("id", text="#")

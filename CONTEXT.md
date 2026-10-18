@@ -236,7 +236,7 @@ auth · catálogo · carrito · checkout · facturas · admin · i18n · tema.
 **Opcional (futuro)**: sincronización multi-dispositivo vía Cloudflare Pages
 Functions + D1 (sin romper el modo standalone).
 
-## 10. Estado de implementación (Fases 0–5 completadas)
+## 10. Estado de implementación (Fases 0–6 completadas)
 
 **Desviación del plan**: la web se hizo **sin build** (HTML + ES modules puros) en
 lugar de Astro. Motivo: cero dependencias, arranque inmediato y 100% standalone.
@@ -251,10 +251,24 @@ reglas no cambia.
 | 1–2. Web | `apps/web/` (index.html + `src/*.js` + styles), IndexedDB, sin servidor de app |
 | 3–4. Escritorio | `apps/desktop/` (Tkinter/ttk, SQLite, DPI-aware, temas e idioma en runtime) |
 | 5. Paridad | `core/cases/` ejecutado por ambos: **26/26 en web y 26/26 en escritorio** |
+| 6. Packaging | `apps/desktop/dist/EquipateFull.exe` — **32-bit**, 9.5 MB, onefile, standalone (incluye Python + Tkinter + `core/`) |
 
 **Verificado en navegador (flujo real)**: login → catálogo → carrito (cantidad 2) →
 compra → factura `8,600 bsS` → detalle con producto y cantidad; stock 61→59; cambio
 de tema (dark/light) e idioma (ES/EN); alta y baja de producto desde admin.
+
+**Verificado en escritorio**: app arranca, login y permiso de admin, cambio de
+idioma y de tema en runtime, y el `.exe` 32-bit arranca de forma standalone y crea
+su base de datos en `%USERPROFILE%\.equipate_full\equipate.db`.
+
+**UI unificada**: idioma y tema con **un solo botón cada uno** en ambas versiones
+(web: `ES / EN` con el activo resaltado + botón de icono sol/luna; escritorio:
+`LangToggle` + `ThemeIconButton` dibujado en canvas). Web **mobile-first**.
+
+**Bug corregido (detectado por prueba de cambio de idioma)**: `retranslate()` en
+`app.py` intentaba fijar la columna `stock` en el `Treeview` del carrito (cuyas
+columnas son `nombre/precio/cantidad`) → error de Tcl. Ahora cada tabla fija sus
+propias columnas.
 
 **Arquitectura de paridad**:
 - Reglas declarativas en `core/rules.json`.
@@ -269,10 +283,12 @@ cascada, validaciones sin duplicar, sin XSS (todo escapado).
 
 **Pendiente / siguiente iteración**:
 - Escritorio: recuperación de contraseña, edición de usuarios/productos en UI, export
-  a Excel/Word (openpyxl/python-docx), `run.cmd` con `.spec` de PyInstaller + firma.
+  a Excel/Word (openpyxl/python-docx), instalador/portable y firma (scripts ya listos
+  en `packaging/`).
 - Web: registro y recuperación de contraseña, página de detalle de producto,
-  validación inline accesible (aria-invalid), envoltorio Astro opcional.
+  validación inline accesible (aria-invalid), PWA, envoltorio Astro opcional.
 - Cobertura: pruebas del `store` web (IndexedDB) fuera del navegador.
+- CI: GitHub Actions para correr los self-tests y adjuntar el `.exe` a un Release.
 - Los archivos PHP de la raíz son la **v1** (referencia); no forman parte de la v2.
 
 ## 11. Registro de cambios de contexto
@@ -281,3 +297,7 @@ cascada, validaciones sin duplicar, sin XSS (todo escapado).
 - 2026-10-18: Añadidas reglas del proyecto y plan de reconstrucción v2.
 - 2026-10-18: Implementadas Fases 0–5 (core + web + escritorio + paridad),
   README, `.gitignore`; self-tests 26/26 en ambos clientes.
+- 2026-10-18: Repo subido a GitHub (`jfelya/equipate-full-2`).
+- 2026-10-18: Web mobile-first; un solo botón de idioma y de tema. Fase 6:
+  `.exe` 32-bit standalone (PyInstaller) + icono propio + scripts de firma.
+  Corregido bug de `retranslate()` en el carrito.
