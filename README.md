@@ -63,6 +63,10 @@ apps\desktop\packaging\build.cmd
 
 Salida: `apps\desktop\dist\EquipateFull.exe` (~9.5 MB, portable).
 
+En GitHub, el workflow `.github/workflows/build.yml` corre los self-tests, compila
+el `.exe` 32-bit y lo adjunta como artifact. Al empujar un tag (`v2.0.0`) lo publica
+en **Releases** para descargar directo.
+
 Si el equipo aún no tiene Python 32-bit:
 
 ```
