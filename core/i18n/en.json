@@ -1,0 +1,95 @@
+{
+  "meta": { "code": "en", "name": "English", "flag": "us" },
+  "app": {
+    "name": "Equipate Full",
+    "tagline": "Equipment store"
+  },
+  "currency": { "symbol": "bsS" },
+  "nav": {
+    "login": "Sign in",
+    "catalog": "Catalog",
+    "cart": "Cart",
+    "invoices": "Invoices",
+    "admin": "Admin",
+    "logout": "Sign out",
+    "register": "Sign up",
+    "recover": "Recover password"
+  },
+  "fields": {
+    "nombre": "First name",
+    "apellido": "Last name",
+    "usuario": "Username",
+    "correo": "Email",
+    "contrasena": "Password",
+    "contrasena2": "Confirm password",
+    "nivel": "Role",
+    "pregunta_secreta": "Secret question",
+    "respuesta_secreta": "Secret answer",
+    "producto": "Product",
+    "stock": "Stock",
+    "precio": "Price",
+    "cantidad": "Quantity",
+    "fecha": "Date",
+    "total": "Total",
+    "acciones": "Actions"
+  },
+  "actions": {
+    "ingresar": "Sign in",
+    "registrar": "Register",
+    "agregar": "Add",
+    "quitar": "Remove",
+    "vaciar": "Empty cart",
+    "comprar": "Checkout",
+    "guardar": "Save",
+    "editar": "Edit",
+    "borrar": "Delete",
+    "ver_detalle": "View details",
+    "volver": "Back",
+    "entrar_como": "Sign in as"
+  },
+  "table": {
+    "productos": "Product list",
+    "carrito": "Cart of {usuario}",
+    "facturas": "Invoices of {usuario}",
+    "detalle_factura": "Invoice #{id} details",
+    "usuarios": "User list"
+  },
+  "messages": {
+    "welcome": "Welcome to Equipate Full",
+    "session_user": "Session: {usuario}",
+    "empty_cart": "You currently have no items in your cart.",
+    "empty_invoices": "You currently have no invoices.",
+    "purchase_ok": "Purchase completed. Invoice #{id}.",
+    "saved_ok": "Saved successfully.",
+    "login_required": "You must sign in to continue.",
+    "logout_ok": "Signed out.",
+    "seeded": "Sample data loaded."
+  },
+  "errors": {
+    "required": "Field \"{field}\" is required.",
+    "minLength": "\"{field}\" must be at least {n} characters long.",
+    "maxLength": "\"{field}\" cannot exceed {n} characters.",
+    "invalidEmail": "The email format is not valid.",
+    "invalidPattern": "\"{field}\" contains invalid characters.",
+    "notInEnum": "The value of \"{field}\" is not allowed.",
+    "notInteger": "\"{field}\" must be an integer.",
+    "notNumber": "\"{field}\" must be a number.",
+    "minValue": "\"{field}\" cannot be less than {n}.",
+    "maxValue": "\"{field}\" cannot be greater than {n}.",
+    "passwordsMismatch": "Passwords do not match.",
+    "maxItems": "The cart cannot hold more than {n} distinct products.",
+    "insufficientStock": "Not enough stock for \"{field}\". Available: {n}.",
+    "emptyCart": "The cart is empty.",
+    "userExists": "User \"{value}\" already exists.",
+    "emailExists": "Email \"{value}\" is already registered.",
+    "invalidCredentials": "Wrong username or password.",
+    "productExists": "Product \"{value}\" already exists."
+  },
+  "theme": { "light": "Light", "dark": "Dark", "language": "Language" },
+  "admin": {
+    "new_user": "Register user",
+    "new_product": "Register product",
+    "users": "Users",
+    "products": "Products"
+  }
+}

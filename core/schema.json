@@ -1,0 +1,64 @@
+{
+  "version": 2,
+  "description": "Modelo de datos compartido. Web y escritorio deben respetarlo.",
+  "entities": {
+    "usuario": {
+      "table": "usuarios",
+      "primaryKey": "id",
+      "autoIncrement": true,
+      "fields": {
+        "id": { "type": "integer" },
+        "nombre": { "type": "string" },
+        "apellido": { "type": "string" },
+        "usuario": { "type": "string", "unique": true },
+        "correo": { "type": "string", "unique": true },
+        "contrasena_hash": { "type": "string" },
+        "nivel": { "type": "enum", "values": ["admin", "cliente"] },
+        "pregunta_secreta": { "type": "string" },
+        "respuesta_secreta": { "type": "string" },
+        "creado": { "type": "datetime" }
+      }
+    },
+    "producto": {
+      "table": "productos",
+      "primaryKey": "id",
+      "autoIncrement": true,
+      "fields": {
+        "id": { "type": "integer" },
+        "nombre": { "type": "string", "unique": true },
+        "stock": { "type": "integer" },
+        "precio": { "type": "number" },
+        "creado": { "type": "datetime" }
+      }
+    },
+    "factura": {
+      "table": "facturas",
+      "primaryKey": "id",
+      "autoIncrement": true,
+      "fields": {
+        "id": { "type": "integer" },
+        "id_cliente": { "type": "integer", "references": { "entity": "usuario", "field": "id" } },
+        "fecha": { "type": "datetime" },
+        "preciototal": { "type": "number" }
+      }
+    },
+    "detalle": {
+      "table": "detalle_factura",
+      "primaryKey": "id",
+      "autoIncrement": true,
+      "fields": {
+        "id": { "type": "integer" },
+        "id_factura": { "type": "integer", "references": { "entity": "factura", "field": "id" } },
+        "id_producto": { "type": "integer", "references": { "entity": "producto", "field": "id" } },
+        "nombre_producto": { "type": "string" },
+        "cantidad": { "type": "integer" },
+        "precio": { "type": "number" }
+      }
+    }
+  },
+  "notes": [
+    "Se guarda contrasena_hash (SHA-256), nunca texto plano.",
+    "detalle guarda nombre_producto para preservar el historial aunque el producto se borre.",
+    "No se usa ON DELETE CASCADE: el historial de facturas nunca se destruye."
+  ]
+}

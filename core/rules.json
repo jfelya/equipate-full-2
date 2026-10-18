@@ -1,0 +1,45 @@
+{
+  "version": 2,
+  "description": "Reglas de validación y de negocio compartidas. Deben interpretarse igual en web y escritorio.",
+  "validation": {
+    "usuario": {
+      "nombre": { "required": true, "type": "string", "minLength": 2, "maxLength": 30 },
+      "apellido": { "required": true, "type": "string", "minLength": 2, "maxLength": 30 },
+      "usuario": { "required": true, "type": "string", "minLength": 4, "maxLength": 20, "pattern": "^[a-z0-9._-]+$" },
+      "correo": { "required": true, "type": "email", "maxLength": 60 },
+      "contrasena": { "required": true, "type": "secret", "minLength": 4, "maxLength": 72 },
+      "contrasena2": { "required": true, "type": "confirm", "matchField": "contrasena" },
+      "nivel": { "required": true, "type": "enum", "values": ["admin", "cliente"] },
+      "pregunta_secreta": { "required": true, "type": "enum", "values": ["Color Favorito", "Comida Favorita", "Banda Favorita", "Animal Favorito"] },
+      "respuesta_secreta": { "required": true, "type": "string", "minLength": 2, "maxLength": 30 }
+    },
+    "producto": {
+      "nombre": { "required": true, "type": "string", "minLength": 4, "maxLength": 120 },
+      "stock": { "required": true, "type": "integer", "minValue": 0, "maxValue": 100000 },
+      "precio": { "required": true, "type": "number", "minValue": 1, "maxValue": 100000000 }
+    },
+    "factura_busqueda": {
+      "id_factura": { "required": true, "type": "integer", "minValue": 1 }
+    }
+  },
+  "business": {
+    "carrito": {
+      "maxItems": 20,
+      "maxCantidadPorItem": 99,
+      "respetarStock": true
+    },
+    "checkout": {
+      "requiereCarrito": true,
+      "descontarStock": true
+    },
+    "cuenta": {
+      "contrasenaUnicaEntreUsuarios": false,
+      "niveles": ["admin", "cliente"]
+    }
+  },
+  "errorKeys": [
+    "required", "minLength", "maxLength", "invalidEmail", "invalidPattern",
+    "notInEnum", "notInteger", "notNumber", "minValue", "maxValue",
+    "passwordsMismatch", "maxItems", "insufficientStock", "emptyCart"
+  ]
+}

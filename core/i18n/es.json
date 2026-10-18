@@ -1,0 +1,95 @@
+{
+  "meta": { "code": "es", "name": "Español", "flag": "es" },
+  "app": {
+    "name": "Equipate Full",
+    "tagline": "Tienda de equipos"
+  },
+  "currency": { "symbol": "bsS" },
+  "nav": {
+    "login": "Iniciar sesión",
+    "catalog": "Catálogo",
+    "cart": "Carrito",
+    "invoices": "Facturas",
+    "admin": "Administración",
+    "logout": "Cerrar sesión",
+    "register": "Registrarse",
+    "recover": "Recuperar contraseña"
+  },
+  "fields": {
+    "nombre": "Nombre",
+    "apellido": "Apellido",
+    "usuario": "Usuario",
+    "correo": "Correo",
+    "contrasena": "Contraseña",
+    "contrasena2": "Confirmar contraseña",
+    "nivel": "Nivel",
+    "pregunta_secreta": "Pregunta secreta",
+    "respuesta_secreta": "Respuesta secreta",
+    "producto": "Producto",
+    "stock": "Stock",
+    "precio": "Precio",
+    "cantidad": "Cantidad",
+    "fecha": "Fecha",
+    "total": "Total",
+    "acciones": "Acciones"
+  },
+  "actions": {
+    "ingresar": "Ingresar",
+    "registrar": "Registrar",
+    "agregar": "Agregar",
+    "quitar": "Quitar",
+    "vaciar": "Vaciar carrito",
+    "comprar": "Proceder a comprar",
+    "guardar": "Guardar",
+    "editar": "Editar",
+    "borrar": "Borrar",
+    "ver_detalle": "Ver detalle",
+    "volver": "Volver",
+    "entrar_como": "Entrar como"
+  },
+  "table": {
+    "productos": "Lista de productos",
+    "carrito": "Carrito de {usuario}",
+    "facturas": "Facturas de {usuario}",
+    "detalle_factura": "Detalle de factura #{id}",
+    "usuarios": "Lista de usuarios"
+  },
+  "messages": {
+    "welcome": "Bienvenido a Equipate Full",
+    "session_user": "Sesión: {usuario}",
+    "empty_cart": "Actualmente no tienes artículos en tu carrito.",
+    "empty_invoices": "Actualmente no tienes facturas.",
+    "purchase_ok": "Compra realizada con éxito. Factura #{id}.",
+    "saved_ok": "Guardado con éxito.",
+    "login_required": "Debes iniciar sesión para continuar.",
+    "logout_ok": "Sesión cerrada.",
+    "seeded": "Datos de ejemplo cargados."
+  },
+  "errors": {
+    "required": "El campo «{field}» es obligatorio.",
+    "minLength": "«{field}» debe tener al menos {n} caracteres.",
+    "maxLength": "«{field}» no puede superar {n} caracteres.",
+    "invalidEmail": "El correo no tiene un formato válido.",
+    "invalidPattern": "«{field}» contiene caracteres no permitidos.",
+    "notInEnum": "El valor de «{field}» no es válido.",
+    "notInteger": "«{field}» debe ser un número entero.",
+    "notNumber": "«{field}» debe ser un número.",
+    "minValue": "«{field}» no puede ser menor que {n}.",
+    "maxValue": "«{field}» no puede ser mayor que {n}.",
+    "passwordsMismatch": "Las contraseñas no coinciden.",
+    "maxItems": "El carrito no puede tener más de {n} productos distintos.",
+    "insufficientStock": "No hay stock suficiente de «{field}». Disponible: {n}.",
+    "emptyCart": "El carrito está vacío.",
+    "userExists": "El usuario «{value}» ya existe.",
+    "emailExists": "El correo «{value}» ya está registrado.",
+    "invalidCredentials": "Usuario o contraseña incorrectos.",
+    "productExists": "El producto «{value}» ya existe."
+  },
+  "theme": { "light": "Claro", "dark": "Oscuro", "language": "Idioma" },
+  "admin": {
+    "new_user": "Registrar usuario",
+    "new_product": "Registrar producto",
+    "users": "Usuarios",
+    "products": "Productos"
+  }
+}

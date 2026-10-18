@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*.db
+*.sqlite
+.equipate_full/
+
+# Node / web
+node_modules/
+
+# Editores / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

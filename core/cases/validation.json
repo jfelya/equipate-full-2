@@ -1,0 +1,51 @@
+{
+  "version": 2,
+  "description": "Casos de validación. Cada app debe producir exactamente el 'expect' indicado.",
+  "cases": [
+    { "name": "nombre vacío",            "entity": "usuario", "field": "nombre",           "input": "",        "expect": ["required"] },
+    { "name": "nombre muy corto",        "entity": "usuario", "field": "nombre",           "input": "A",       "expect": ["minLength"] },
+    { "name": "nombre válido",           "entity": "usuario", "field": "nombre",           "input": "Ana",     "expect": [] },
+    { "name": "nombre muy largo",        "entity": "usuario", "field": "nombre",           "input": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "expect": ["maxLength"] },
+    { "name": "usuario con mayúsculas",  "entity": "usuario", "field": "usuario",          "input": "Abc1",    "expect": ["invalidPattern"] },
+    { "name": "usuario válido",          "entity": "usuario", "field": "usuario",          "input": "abc.1-2", "expect": [] },
+    { "name": "usuario muy corto",       "entity": "usuario", "field": "usuario",          "input": "ab",      "expect": ["minLength"] },
+    { "name": "correo inválido",         "entity": "usuario", "field": "correo",           "input": "correo",  "expect": ["invalidEmail"] },
+    { "name": "correo válido",           "entity": "usuario", "field": "correo",           "input": "a@b.com", "expect": [] },
+    { "name": "nivel inválido",          "entity": "usuario", "field": "nivel",            "input": "root",    "expect": ["notInEnum"] },
+    { "name": "nivel válido",            "entity": "usuario", "field": "nivel",            "input": "cliente", "expect": [] },
+    { "name": "contrasena muy corta",    "entity": "usuario", "field": "contrasena",       "input": "abc",     "expect": ["minLength"] },
+    { "name": "stock no entero",         "entity": "producto","field": "stock",            "input": "3.5",     "expect": ["notInteger"] },
+    { "name": "stock negativo",          "entity": "producto","field": "stock",            "input": "-1",      "expect": ["minValue"] },
+    { "name": "stock válido",            "entity": "producto","field": "stock",            "input": "10",      "expect": [] },
+    { "name": "precio no numérico",      "entity": "producto","field": "precio",           "input": "abc",     "expect": ["notNumber"] },
+    { "name": "precio en cero",          "entity": "producto","field": "precio",           "input": "0",       "expect": ["minValue"] },
+    { "name": "nombre producto corto",   "entity": "producto","field": "nombre",           "input": "TV",      "expect": ["minLength"] },
+    { "name": "id_factura no entero",    "entity": "factura_busqueda", "field": "id_factura", "input": "x",   "expect": ["notInteger"] },
+    { "name": "id_factura válido",       "entity": "factura_busqueda", "field": "id_factura", "input": "5",   "expect": [] }
+  ],
+  "formCases": [
+    {
+      "name": "contraseñas no coinciden",
+      "entity": "usuario",
+      "values": { "nombre": "Ana", "apellido": "Diaz", "usuario": "anax", "correo": "ana@x.com", "contrasena": "abcd", "contrasena2": "abce", "nivel": "cliente", "pregunta_secreta": "Color Favorito", "respuesta_secreta": "azul" },
+      "expectFields": ["contrasena2"],
+      "expectKeys": ["passwordsMismatch"]
+    },
+    {
+      "name": "formulario válido",
+      "entity": "usuario",
+      "values": { "nombre": "Ana", "apellido": "Diaz", "usuario": "anax", "correo": "ana@x.com", "contrasena": "abcd", "contrasena2": "abcd", "nivel": "cliente", "pregunta_secreta": "Color Favorito", "respuesta_secreta": "azul" },
+      "expectFields": [],
+      "expectKeys": []
+    }
+  ],
+  "checkoutCases": [
+    {
+      "name": "compra simple descuenta stock",
+      "product": { "nombre": "Test", "stock": 10, "precio": 500 },
+      "cart": [ { "cantidad": 3 } ],
+      "expectTotal": 1500,
+      "expectStockAfter": 7
+    }
+  ]
+}

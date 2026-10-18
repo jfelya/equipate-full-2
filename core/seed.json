@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "description": "Datos de ejemplo idénticos para web y escritorio. Contraseñas: admin123 / cliente1 / nico123.",
+  "usuarios": [
+    { "nombre": "Felix", "apellido": "Añez", "usuario": "jfelya", "correo": "fely@equipate.test", "contrasena_hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", "nivel": "admin", "pregunta_secreta": "Comida Favorita", "respuesta_secreta": "cotufas" },
+    { "nombre": "Nico", "apellido": "Gonzalez", "usuario": "nicoandroid", "correo": "nico@equipate.test", "contrasena_hash": "7e7fc357fc23749f5b63f6532c85b5660f840d0cb901e9017c2fb110e1486781", "nivel": "admin", "pregunta_secreta": "Color Favorito", "respuesta_secreta": "azul" },
+    { "nombre": "Joselin", "apellido": "Castillo", "usuario": "josecas", "correo": "jose@equipate.test", "contrasena_hash": "caae655b2617405e721d27d433331d27adb871354ce6c9be45acc90866df24f4", "nivel": "cliente", "pregunta_secreta": "Color Favorito", "respuesta_secreta": "rosado" }
+  ],
+  "productos": [
+    { "nombre": "Lavadora", "stock": 61, "precio": 4300 },
+    { "nombre": "Televisor OLED 8K", "stock": 82, "precio": 11500 },
+    { "nombre": "Módem de Internet", "stock": 68, "precio": 24000 },
+    { "nombre": "Cafetera 30xx", "stock": 76, "precio": 10200 },
+    { "nombre": "Microondas", "stock": 67, "precio": 21800 }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "equipate-web",
+  "private": true,
+  "type": "module",
+  "description": "App web standalone (sin build, sin dependencias).",
+  "scripts": {
+    "serve": "py -m http.server 8080",
+    "test": "node src/selftest.mjs"
+  }
+}

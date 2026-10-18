@@ -1,0 +1,115 @@
+/* Estilos base. Los colores vienen de core/tokens.json (via theme.js -> variables CSS). */
+:root {
+  --bg: #040c0e; --surface: #212624; --surfaceAlt: #2e303e; --text: #a4978e;
+  --textStrong: #e8e3dc; --muted: #6e6a65; --link: #9199be; --accent: #be9063;
+  --primary: #54678f; --secondary: #9199be; --info: #f4a460; --danger: #a7414a;
+  --success: #4e8d6b; --border: #3a3f3c; --radius: 14px;
+  --font: "Century Gothic", "Segoe UI", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font);
+  font-size: 15px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+#nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+#nav .brand { font-size: 20px; font-weight: bold; color: var(--accent); }
+#nav .tagline { font-size: 12px; color: var(--muted); font-weight: normal; }
+#nav .links { display: flex; gap: 6px; flex: 1; }
+#nav .session { display: flex; align-items: center; gap: 8px; }
+#nav .who { color: var(--textStrong); font-size: 13px; }
+
+button {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surfaceAlt);
+  color: var(--text);
+  cursor: pointer;
+}
+button:hover { background: var(--primary); color: var(--textStrong); }
+button.primary { background: var(--primary); color: var(--textStrong); }
+button.danger { background: var(--danger); color: var(--textStrong); }
+button.mini-btn { padding: 4px 8px; font-size: 12px; }
+#nav .links button.active { border-color: var(--accent); color: var(--accent); }
+
+main { max-width: 1040px; margin: 24px auto; padding: 0 16px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.card.narrow { max-width: 420px; margin: 0 auto; }
+.card + .card { margin-top: 18px; }
+
+h1 { font-size: 24px; color: var(--accent); margin: 0 0 16px; }
+h2 { font-size: 18px; color: var(--accent); }
+
+label { display: block; margin: 10px 0; font-size: 14px; }
+input, select {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surfaceAlt);
+  color: var(--textStrong);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: var(--accent); font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
+tbody tr:hover { background: var(--surfaceAlt); }
+
+.total { text-align: right; font-size: 18px; color: var(--textStrong); font-weight: bold; }
+.row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.muted { color: var(--muted); }
+.hint { color: var(--muted); font-size: 12px; }
+
+.toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  max-width: 340px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--surfaceAlt);
+  color: var(--textStrong);
+  border-left: 4px solid var(--info);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.toast:not(:empty) { opacity: 1; }
+.toast.ok { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--danger); }
+.toast.muted { border-left-color: var(--muted); }
+
+.footer { text-align: center; color: var(--muted); font-size: 12px; padding: 24px; }
+
+@media (max-width: 720px) {
+  .cols { grid-template-columns: 1fr; }
+  #nav .links { order: 3; width: 100%; }
+}
