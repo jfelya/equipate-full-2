@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { validateEntity } from "./validate.js";
 
-const coreDir = new URL("../../../core/", import.meta.url);
+const coreDir = new URL("../../core/", import.meta.url);
 const read = (p) => JSON.parse(readFileSync(fileURLToPath(new URL(p, coreDir)), "utf-8"));
 
 const rules = read("rules.json");

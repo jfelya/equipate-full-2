@@ -1,0 +1,19 @@
+{
+  "name": "equipate-full",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Equipate Full: tienda web (Astro) + app de escritorio (Python/Tkinter) con nucleo compartido.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test:web": "node src/scripts/selftest.mjs",
+    "test:desktop": "py desktop/src/selftest.py",
+    "test": "npm run test:web && npm run test:desktop",
+    "exe": "desktop\\packaging\\build.cmd"
+  },
+  "dependencies": {
+    "astro": "^5.0.0"
+  }
+}

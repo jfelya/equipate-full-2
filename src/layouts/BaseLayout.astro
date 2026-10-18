@@ -1,0 +1,47 @@
+---
+// Layout base. Estructura segun Astro: src/layouts/.
+import "../styles/global.css";
+
+// El nucleo compartido se resuelve en tiempo de compilacion (frontmatter) y se
+// inyecta en la pagina; el cliente no hace fetch de JSON.
+import schema from "../../core/schema.json";
+import rules from "../../core/rules.json";
+import tokens from "../../core/tokens.json";
+import seed from "../../core/seed.json";
+import es from "../../core/i18n/es.json";
+import en from "../../core/i18n/en.json";
+import cases from "../../core/cases/validation.json";
+
+interface Props {
+  title?: string;
+}
+
+const { title = "Equipate Full" } = Astro.props;
+const core = { schema, rules, tokens, seed, i18n: { es, en }, cases };
+---
+
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Equipate Full: tienda de equipos (web + escritorio)." />
+    <meta name="theme-color" content="#040C0E" />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {/* Evita el parpadeo de tema: aplica el guardado antes de pintar. */}
+    <script is:inline>
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+    </script>
+  </head>
+  <body>
+    <slot />
+    <script is:inline define:vars={{ core }}>
+      window.__CORE__ = core;
+    </script>
+    <script>
+      import "../scripts/app.js";
+    </script>
+  </body>
+</html>

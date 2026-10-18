@@ -5,17 +5,17 @@ __pycache__/
 *.sqlite
 .equipate_full/
 
-# PyInstaller
-apps/desktop/build/
-apps/desktop/dist/
-*.spec.bak
+# Astro / build del sitio
+node_modules/
+dist/
+.astro/
+
+# PyInstaller (intermedios; el .exe final se copia a public/)
+desktop/build/
 
 # Firma
 *.cer
 *.pfx
-
-# Node / web
-node_modules/
 
 # Editores / SO
 .vscode/

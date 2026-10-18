@@ -193,26 +193,28 @@ que parten de **una misma estructura base**.
   sesiones, texto plano) y no cumple el requisito "standalone".
 - **Fuente única de verdad** en `core/` (JSON, agnóstico de lenguaje): esquema de
   datos, reglas de negocio, textos i18n y tokens de diseño. Ambos clientes la leen.
-- **Web**: *inicialmente* Astro 5 + Tailwind v4. **Decisión final**: HTML + ES
-  modules **sin build** (cero dependencias, 100% standalone), datos en **IndexedDB**,
-  sin backend. Astro queda como envoltorio opcional (ver §10).
+- **Web**: **Astro 5** (`output: 'static'`) siguiendo la guía de estructura de Astro
+  (`src/pages`, `src/layouts`, `src/scripts`, `src/styles`, `public/`). Los JSON de
+  `core/` se importan en el frontmatter (build-time) y se inyectan al cliente como
+  `window.__CORE__`: sin fetch y sin backend. Datos en **IndexedDB**.
 - **Escritorio**: Python 3.14 + Tkinter/ttk, **PyInstaller** single-file, datos en
   **SQLite**.
 - Mismo **modelo de datos**, mismas **reglas**, mismas **claves i18n (ES/EN)**,
   misma **paleta**.
 
-**Estructura monorepo**:
+**Estructura del repositorio** (raíz = proyecto Astro):
 ```
-equipate-full/
-├── core/                 # fuente única (lenguaje-agnóstica)
-│   ├── schema.json       # entidades: usuarios, productos, facturas, detalle, carrito
-│   ├── rules.json        # validaciones y reglas de negocio
-│   ├── i18n/es.json en.json
-│   ├── tokens.json       # colores, espaciados, tipografía
-│   └── cases/            # fixtures para el self-test de paridad
-├── apps/web/             # Astro 5 + Tailwind v4 (estático, IndexedDB)
-├── apps/desktop/         # Python 3.14 + Tkinter (SQLite, PyInstaller)
-└── docs/
+/
+├── astro.config.mjs · package.json · tsconfig.json
+├── public/               # estáticos → raíz del sitio (EquipateFull.exe, favicon)
+├── src/
+│   ├── pages/index.astro # página principal del sitio
+│   ├── layouts/BaseLayout.astro
+│   ├── scripts/          # app.js, core.js, i18n.js, store.js, theme.js, validate.js
+│   └── styles/global.css
+├── core/                 # fuente única: schema, rules, i18n, tokens, seed, cases
+├── desktop/              # app Windows: src, packaging, assets, tools, dist
+└── legacy/               # proyecto original en PHP (v1)
 ```
 
 **Módulos del dominio (idénticos en ambos clientes)**:
@@ -248,10 +250,19 @@ reglas no cambia.
 | Fase | Resultado |
 |---|---|
 | 0. Contrato `core/` | `schema.json`, `rules.json`, `i18n/es|en.json`, `tokens.json`, `seed.json`, `cases/validation.json` |
-| 1–2. Web | `apps/web/` (index.html + `src/*.js` + styles), IndexedDB, sin servidor de app |
-| 3–4. Escritorio | `apps/desktop/` (Tkinter/ttk, SQLite, DPI-aware, temas e idioma en runtime) |
+| 1–2. Web | `src/` (Astro 5: pages, layouts, scripts, styles) + `public/`, IndexedDB |
+| 3–4. Escritorio | `desktop/` (Tkinter/ttk, SQLite, DPI-aware, temas e idioma en runtime) |
 | 5. Paridad | `core/cases/` ejecutado por ambos: **26/26 en web y 26/26 en escritorio** |
-| 6. Packaging | `apps/desktop/dist/EquipateFull.exe` — **32-bit**, 9.5 MB, onefile, standalone (incluye Python + Tkinter + `core/`) |
+| 6. Packaging | `desktop/dist/EquipateFull.exe` — **32-bit**, 9.5 MB, onefile, standalone (incluye Python + Tkinter + `core/`); se copia a `public/EquipateFull.exe` |
+
+**Reestructuración (organización final)**: raíz = proyecto Astro (sitio) con el `.exe`
+en `public/`; `desktop/` = resto de la app Windows; `legacy/` = PHP original (v1).
+Los movimientos se hicieron con `git mv` para conservar el historial.
+
+**Verificado tras la reestructuración**: `npm run build` genera `dist/` (index.html,
+`_astro/*`, `EquipateFull.exe`, favicon); el sitio compilado funciona en navegador
+(login → carrito → compra → factura); `EquipateFull.exe` es 32-bit y se descarga desde
+`/EquipateFull.exe`; `npm run test` → 26/26 en ambos.
 
 **Verificado en navegador (flujo real)**: login → catálogo → carrito (cantidad 2) →
 compra → factura `8,600 bsS` → detalle con producto y cantidad; stock 61→59; cambio
@@ -301,3 +312,6 @@ cascada, validaciones sin duplicar, sin XSS (todo escapado).
 - 2026-10-18: Web mobile-first; un solo botón de idioma y de tema. Fase 6:
   `.exe` 32-bit standalone (PyInstaller) + icono propio + scripts de firma.
   Corregido bug de `retranslate()` en el carrito.
+- 2026-10-18: Reestructuración según la guía de Astro: raíz = sitio Astro
+  (`src/`, `public/`), `desktop/` para la app Windows, `legacy/` para el PHP v1.
+  Núcleo `core/` inyectado en build-time. CI adaptada a las nuevas rutas.

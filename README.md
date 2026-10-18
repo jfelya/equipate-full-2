@@ -1,28 +1,73 @@
 # Equipate Full — v2
 
-Reconstrucción de la tienda **Guayuco Digital** como dos clientes standalone que
-comparten un mismo núcleo.
+Tienda **Guayuco Digital** reconstruida como **sitio web (Astro)** y **app de
+escritorio (Python/Tkinter)** que comparten un mismo núcleo de datos y reglas.
 
-| Cliente | Stack | Datos | Ejecutar |
-|---|---|---|---|
-| Web | HTML + ES modules (sin build) | IndexedDB | `apps\web\run.cmd` |
-| Escritorio | Python 3.14 + Tkinter/ttk | SQLite | `apps\desktop\run.cmd` |
-| Escritorio (`.exe`) | PyInstaller onefile, **32-bit** | SQLite | `apps\desktop\dist\EquipateFull.exe` |
-
-La web es **mobile-first** (diseño base para móvil). Idioma y tema se controlan con
-**un solo botón cada uno** en ambas versiones.
-
-Los archivos PHP de la raíz son la **versión 1** (referencia histórica); la v2 vive
-en `core/` y `apps/`.
-
-## Estructura
+## Estructura (raíz = proyecto Astro)
 
 ```
-core/            Fuente única: schema, rules, i18n, tokens, seed, cases
-apps/web/        Cliente web standalone
-apps/desktop/    Cliente de escritorio
-docs/            Documentación
-CONTEXT.md       Contexto y decisiones del proyecto
+/
+├── astro.config.mjs        Config del sitio (output: static)
+├── package.json            Scripts: dev, build, test, exe
+├── tsconfig.json
+├── public/                 Estáticos → se sirven en la raíz del sitio
+│   ├── EquipateFull.exe    ← app de escritorio (32-bit, portable)
+│   └── favicon.svg
+├── src/                    Código del sitio (guía de Astro)
+│   ├── pages/index.astro   Página principal del sitio
+│   ├── layouts/BaseLayout.astro
+│   ├── scripts/            app.js · core.js · i18n.js · store.js · theme.js
+│   │                       · validate.js · selftest.mjs
+│   └── styles/global.css
+├── core/                   Fuente única: schema, rules, i18n, tokens, seed, cases
+├── desktop/                App de Windows (todo lo demás)
+│   ├── src/                Código Python (paquete `equipate`)
+│   ├── packaging/          .spec, version_info, build.cmd, firma
+│   ├── assets/             icono (icon.ico / icon.png)
+│   ├── tools/              gen_icon.py
+│   ├── dist/               .exe compilado (ignorado por git)
+│   ├── run.cmd             ejecutar en desarrollo
+│   └── selftest.cmd
+└── legacy/                 Proyecto original en PHP (v1, solo referencia)
+```
+
+- **Raíz** = sitio web (Astro) y contiene el `.exe` en `public/`.
+- **`desktop/`** = el resto de la app de Windows (código, empaquetado, recursos).
+- **`legacy/`** = los archivos PHP originales.
+
+## Ejecutar
+
+| Qué | Comando |
+|---|---|
+| Web (desarrollo) | `npm install` y luego `run-web.cmd` (o `npm run dev`) |
+| Web (compilada) | `npm run build` → `dist/` (estático, se puede subir a cualquier hosting) |
+| Escritorio | `desktop\run.cmd` |
+| App `.exe` | `desktop\dist\EquipateFull.exe` (o descárgala en `/EquipateFull.exe`) |
+
+## Compilar el `.exe` de Windows
+
+Se compila **32-bit** a propósito: un solo binario corre en Windows de 32 y 64 bits.
+Incluye Python, Tkinter y `core/` (no requiere instalar nada).
+
+```
+desktop\packaging\build.cmd
+```
+
+Salida: `desktop\dist\EquipateFull.exe` y se copia a `public\EquipateFull.exe`.
+
+Si el equipo no tiene Python 32-bit:
+
+```
+winget install Python.Python.3.12 --architecture x86 --scope user
+py -3.12-32 -m pip install pyinstaller
+```
+
+Firma opcional: `desktop\packaging\sign.ps1` + `desktop\packaging\install-cert.cmd`.
+
+## Pruebas
+
+```
+npm run test        # web (26) + escritorio (26), mismas reglas de core/
 ```
 
 ## Credenciales de ejemplo
@@ -33,58 +78,15 @@ CONTEXT.md       Contexto y decisiones del proyecto
 | `nicoandroid` | `nico123` | admin |
 | `josecas` | `cliente1` | cliente |
 
-## Self-tests (paridad)
-
-```
-apps\desktop\selftest.cmd      # 26/26
-node apps\web\src\selftest.mjs # 26/26
-```
-
-Ambos leen los mismos `core/cases/validation.json`.
-
 ## Cómo funciona la paridad
-- `core/schema.json` define entidades y campos.
-- `core/rules.json` define validaciones y reglas de negocio.
-- `core/i18n/*.json` define todos los textos ES/EN.
-- `core/tokens.json` define la paleta (claro/oscuro).
-- Cada app implementa un intérprete de esas reglas:
-  `apps/web/src/validate.js` y `apps/desktop/src/equipate/validate.py`.
 
-Cambiar una regla en `core/` afecta a **ambas** apps.
-
-## Compilar el ejecutable de Windows
-
-El `.exe` se compila **32-bit** a propósito: un solo binario corre en Windows de
-32 y 64 bits. Incluye Python, Tkinter y `core/` (no requiere instalar nada).
-
-```
-apps\desktop\packaging\build.cmd
-```
-
-Salida: `apps\desktop\dist\EquipateFull.exe` (~9.5 MB, portable).
-
-En GitHub, el workflow `.github/workflows/build.yml` corre los self-tests, compila
-el `.exe` 32-bit y lo adjunta como artifact. Al empujar un tag (`v2.0.0`) lo publica
-en **Releases** para descargar directo.
-
-Si el equipo aún no tiene Python 32-bit:
-
-```
-winget install Python.Python.3.12 --architecture x86 --scope user
-py -3.12-32 -m pip install pyinstaller
-```
-
-Firma opcional (evita el aviso de editor desconocido):
-
-```
-powershell -ExecutionPolicy Bypass -File apps\desktop\packaging\sign.ps1
-apps\desktop\packaging\install-cert.cmd
-```
+`core/` es la fuente única. Cada app implementa un intérprete de esas reglas:
+`src/scripts/validate.js` (web) y `desktop/src/equipate/validate.py` (escritorio).
+Cambiar una regla en `core/` afecta a **ambas**.
 
 ## Notas
 
-- Contraseñas con SHA-256 (no texto plano).
+- Contraseñas con SHA-256 (no texto plano); sin SQLi (la web no usa SQL); sin XSS.
 - El historial de facturas guarda el nombre del producto y no se borra en cascada.
-- La web no necesita servidor de aplicación: solo un servidor estático
-  (`py -m http.server`) porque los navegadores no permiten `fetch` de JSON por
-  `file://`. No hay backend ni base de datos remota.
+- El sitio es 100% estático: sin backend ni base de datos remota (datos en IndexedDB).
+- Mobile-first; idioma y tema con un solo botón cada uno.

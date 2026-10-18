@@ -27,5 +27,9 @@ if errorlevel 1 (
 )
 
 echo.
-echo Listo:  apps\desktop\dist\EquipateFull.exe
+echo Listo:  desktop\dist\EquipateFull.exe
 dir /b dist
+if exist "..\public" (
+  copy /y dist\EquipateFull.exe ..\public\EquipateFull.exe >nul
+  echo Copiado a public\EquipateFull.exe
+)

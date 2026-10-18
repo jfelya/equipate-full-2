@@ -133,6 +133,8 @@ tbody tr:hover { background: var(--surfaceAlt); }
 .toast.muted { border-left-color: var(--muted); }
 
 .footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px 12px; }
+.footer .download { display: block; margin-top: 6px; color: var(--link); }
+.footer .download:hover { color: var(--accent); }
 
 /* --- tablet --- */
 @media (min-width: 560px) {

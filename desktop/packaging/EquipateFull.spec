@@ -3,8 +3,8 @@
 from pathlib import Path
 
 PACKAGING = Path(SPECPATH).resolve()
-APP = PACKAGING.parent                 # apps/desktop
-REPO = APP.parent.parent                # raiz del repo
+APP = PACKAGING.parent                 # desktop/
+REPO = APP.parent                      # raiz del repo
 CORE = REPO / "core"
 ASSETS = APP / "assets"
 ENTRY = APP / "src" / "main.py"
